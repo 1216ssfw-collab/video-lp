@@ -54,6 +54,69 @@
     font-size: 18px;
   }
 
+  /* カウントダウン */
+  .countdown-section {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .countdown-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: #222;
+    margin-bottom: 4px;
+  }
+  .countdown-sub {
+    font-size: 15px;
+    color: #c0392b;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .countdown-boxes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .countdown-num {
+    background: #3a3a3a;
+    color: #fff;
+    font-size: 36px;
+    font-weight: 700;
+    min-width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 6px;
+  }
+
+  /* 期限切れ */
+  .expired-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 18px;
+    border-radius: 8px;
+    z-index: 20;
+  }
+
   /* CTAボタン */
   .cta-section {
     margin-top: 48px;
@@ -170,6 +233,30 @@
 
 <div class="container">
 
+  <!-- カウントダウン -->
+  <div class="countdown-section">
+    <p class="countdown-title">アーカイブ視聴ページ</p>
+    <p class="countdown-sub">※セミナー視聴期限は2日間です</p>
+    <div class="countdown-boxes">
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-days">0</div>
+        <span class="countdown-label">日</span>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-hours">00</div>
+        <span class="countdown-label">時間</span>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-mins">00</div>
+        <span class="countdown-label">分</span>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-secs">00</div>
+        <span class="countdown-label">秒</span>
+      </div>
+    </div>
+  </div>
+
   <!-- 動画エリア -->
   <div class="video-wrapper" id="videoWrapper" onclick="playVideo()">
     <img class="video-thumb" src="https://img.youtube.com/vi/dqAmDzq86jo/maxresdefault.jpg" alt="動画サムネイル">
@@ -192,12 +279,54 @@
 </div>
 
 <script>
+var LIMIT_MS = 2 * 24 * 60 * 60 * 1000; // 2日
+var KEY = 'video_lp_first_visit';
+var firstVisit = localStorage.getItem(KEY);
+if (!firstVisit) {
+  firstVisit = Date.now();
+  localStorage.setItem(KEY, firstVisit);
+} else {
+  firstVisit = Number(firstVisit);
+}
+var deadline = firstVisit + LIMIT_MS;
+var expired = false;
+
+function updateCountdown() {
+  var remaining = deadline - Date.now();
+  if (remaining <= 0) {
+    remaining = 0;
+    if (!expired) {
+      expired = true;
+      showExpired();
+    }
+  }
+  var s = Math.floor(remaining / 1000);
+  var d = Math.floor(s / 86400); s -= d * 86400;
+  var h = Math.floor(s / 3600); s -= h * 3600;
+  var m = Math.floor(s / 60); s -= m * 60;
+  document.getElementById('cd-days').textContent = d;
+  document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+  document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
+  document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
+}
+
+function showExpired() {
+  var wrapper = document.getElementById('videoWrapper');
+  wrapper.innerHTML = '<div class="expired-overlay">視聴期限が終了しました</div>';
+  wrapper.onclick = null;
+}
+
 function playVideo() {
+  if (expired) return;
   var wrapper = document.getElementById('videoWrapper');
   wrapper.innerHTML = '<iframe src="https://www.youtube.com/embed/dqAmDzq86jo?autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0" allowfullscreen allow="autoplay"></iframe><div class="yt-logo-cover"></div><div class="yt-watermark-cover"></div>';
   wrapper.classList.add('playing');
   wrapper.onclick = null;
 }
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+if (expired) showExpired();
 </script>
 </body>
 </html>
