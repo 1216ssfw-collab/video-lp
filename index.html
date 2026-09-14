@@ -122,39 +122,23 @@
     opacity: 0.85;
   }
 
-  /* YouTube UI隠し：上部タイトルバー */
-  .yt-top-cover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    z-index: 10;
-    pointer-events: none;
-    background: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .video-wrapper.playing .yt-top-cover {
-    opacity: 1;
-  }
-  /* YouTube UI隠し：右下ロゴ */
+  /* YouTubeロゴ隠し */
   .yt-logo-cover {
     position: absolute;
-    bottom: 36px;
+    bottom: 0;
     right: 0;
     width: 140px;
     height: 44px;
     z-index: 10;
     pointer-events: none;
-    background: linear-gradient(to right, transparent 0%, #000 40%);
+    background: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 40%);
     opacity: 0;
     transition: opacity 0.3s;
   }
   .video-wrapper.playing .yt-logo-cover {
     opacity: 1;
   }
-  /* YouTubeウォーターマーク隠し */
+  /* YouTubeウォーターマーク隠し（動画中央右下に出るロゴ） */
   .yt-watermark-cover {
     position: absolute;
     bottom: 50px;
@@ -210,7 +194,7 @@
 <script>
 function playVideo() {
   var wrapper = document.getElementById('videoWrapper');
-  wrapper.innerHTML = '<iframe src="https://www.youtube.com/embed/dqAmDzq86jo?autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0&disablekb=0" allowfullscreen allow="autoplay"></iframe><div class="yt-top-cover"></div><div class="yt-logo-cover"></div><div class="yt-watermark-cover"></div>';
+  wrapper.innerHTML = '<iframe src="https://www.youtube.com/embed/dqAmDzq86jo?autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0" allowfullscreen allow="autoplay"></iframe><div class="yt-logo-cover"></div><div class="yt-watermark-cover"></div>';
   wrapper.classList.add('playing');
   wrapper.onclick = null;
 }
